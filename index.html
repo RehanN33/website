@@ -445,35 +445,19 @@
 
 
         // 3. LOGIKA KONEKSI GOOGLE SHEETS UNTUK SISA SLOT
-        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1r18TEqlPzMUi3yoF98FxhzKQyuL2VNyJt_sPM7Wtvko/export?format=csv&gid=0";
+        async function loadSlots() {
+    try {
+        const response = await fetch('./slots.json?t=' + Date.now());
+        const data = await response.json();
 
-        function fetchLiveSlots() {
-            const slotElement = document.getElementById('slots-left');
-            if (!slotElement) return;
+        document.getElementById('slots-left').textContent = data.slots;
+    } catch (error) {
+        console.error('Gagal memuat slot:', error);
+    }
+}
 
-            if (GOOGLE_SHEET_CSV_URL === "https://docs.google.com/spreadsheets/d/1r18TEqlPzMUi3yoF98FxhzKQyuL2VNyJt_sPM7Wtvko/export?format=csv&gid=0") {
-                const day = new Date().getDay();
-                let simulatedSlots = 10;
-                if (day === 1) simulatedSlots = 9;
-                else if (day === 2) simulatedSlots = 7;
-                else if (day === 3) simulatedSlots = 5;
-                else if (day === 4) simulatedSlots = 3;
-                else if (day === 5) simulatedSlots = 2;
-                else simulatedSlots = 1;
-                slotElement.textContent = simulatedSlots;
-                return;
-            }
-
-            fetch(GOOGLE_SHEET_CSV_URL)
-                .then(response => response.text())
-                .then(data => {
-                    const cleanValue = data.trim();
-                    if (!isNaN(cleanValue) && cleanValue !== "") {
-                        slotElement.textContent = cleanValue;
-                    }
-                })
-                .catch(error => console.error("Gagal memuat data slot harian:", error));
-        }
+loadSlots();
+setInterval(loadSlots, 10000);
         fetchLiveSlots();
 
 
